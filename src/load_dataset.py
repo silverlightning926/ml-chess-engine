@@ -83,7 +83,7 @@ def _generateBoards():
 
 
 def _encodeBoard(board: chess.Board):
-    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.int8)
+    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.float32)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
