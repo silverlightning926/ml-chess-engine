@@ -64,11 +64,11 @@ def _generateBoards():
     def processRow(row):
         winner = row['winner']
         if winner == 'white':
-            winner = 2
-        elif winner == 'black':
-            winner = 0
-        else:
             winner = 1
+        elif winner == 'black':
+            winner = -1
+        else:
+            winner = 0
 
         board = chess.Board()
         for move in row['moves'].split():
