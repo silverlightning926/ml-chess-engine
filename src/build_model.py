@@ -6,9 +6,9 @@ def build_model():
     model = Sequential([
         Input(shape=(8, 8, 12)),
         Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D((2, 2)),
+        MaxPooling2D((3, 3)),
         Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D((2, 2)),
+        MaxPooling2D((3, 3)),
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.2),
