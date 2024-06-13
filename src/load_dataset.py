@@ -1,12 +1,11 @@
+from tqdm import tqdm
 import os
-
 from kaggle.api.kaggle_api_extended import KaggleApi
-
 import pandas as pd
-
 import chess
-
 import numpy as np
+import tensorflow as tf
+from tqdm import tqdm
 
 DATASET_PATH = 'data/games.csv'
 PIECE_TO_INDEX = {
@@ -58,26 +57,30 @@ def _generateBoards():
     df = _readData()
 
     boards = []
-    for i in range(len(df)):
+    winners = []
 
-        winner = df['winner'][i]
+    tqdm.pandas(desc='Processing Data')
+
+    def processRow(row):
+        winner = row['winner']
         if winner == 'white':
-            winner = 1
+            winner = 2
         elif winner == 'black':
-            winner = -1
-        else:
             winner = 0
+        else:
+            winner = 1
 
         board = chess.Board()
-
-        print(f'Processing game {i + 1}/{len(df)}')
-
-        for move in df['moves'][i].split():
+        for move in row['moves'].split():
             board.push_san(move)
             encodedBoard = _encodeBoard(board)
-            boards.append((encodedBoard, winner))
 
-    return boards
+            boards.append(encodedBoard)
+            winners.append(winner)
+
+    df.progress_apply(processRow, axis=1)
+
+    return boards, winners
 
 
 def _encodeBoard(board: chess.Board):
@@ -92,7 +95,21 @@ def _encodeBoard(board: chess.Board):
     return encodedBoard
 
 
+def _generateDataset(boards, winners):
+    print('Generating dataset...')
+
+    boards = np.array(boards)
+    winners = np.array(winners)
+
+    dataset = tf.data.Dataset.from_tensor_slices((boards, winners))
+    dataset = dataset.shuffle(1000)
+    dataset = dataset.batch(32)
+
+    return dataset
+
+
 def getData():
     _fetchData()
-    boards: list = _generateBoards()
-    return boards
+    boards, winners = _generateBoards()
+    dataset = _generateDataset(boards, winners)
+    return dataset
