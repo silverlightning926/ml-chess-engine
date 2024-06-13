@@ -85,8 +85,7 @@ def _generateBoards():
     move_counts = np.array(move_counts)
     min_moves = np.min(move_counts)
     max_moves = np.max(move_counts)
-    normalized_move_counts = (move_counts - min_moves) / \
-        (max_moves - min_moves)
+    normalized_move_counts = (move_counts - min_moves) / (max_moves - min_moves)
 
     return boards, winners, normalized_move_counts
 
