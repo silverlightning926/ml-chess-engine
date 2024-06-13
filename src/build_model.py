@@ -4,7 +4,7 @@ from keras.api.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, Inpu
 
 def build_model():
     model = Sequential([
-        Input(shape=(8, 8, 12)),
+        Input(shape=(12, 8, 8)),
         Conv2D(64, (2, 2), activation='relu'),
         Conv2D(64, (2, 2), activation='relu'),
         Conv2D(64, (2, 2), activation='relu'),

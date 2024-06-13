@@ -84,13 +84,13 @@ def _generateBoards():
 
 
 def _encodeBoard(board: chess.Board):
-    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.int8)
+    encodedBoard = np.zeros(shape=(12, 8, 8), dtype=np.int8)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece is not None:
-            encodedBoard[chess.square_rank(square)][chess.square_file(
-                square)][PIECE_TO_INDEX[piece.symbol()]] = 1
+            encodedBoard[PIECE_TO_INDEX[piece.symbol()]][chess.square_rank(square)][chess.square_file(
+                square)] = 1
 
     return encodedBoard
 
