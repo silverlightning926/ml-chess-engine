@@ -57,6 +57,7 @@ def _generateBoards():
 
     boards = []
     winners = []
+    move_counts = []
 
     tqdm.pandas(desc='Processing Data')
 
@@ -77,9 +78,17 @@ def _generateBoards():
             boards.append(encodedBoard)
             winners.append(winner)
 
+            move_counts.append(board.fullmove_number)
+
     df.progress_apply(processRow, axis=1)
 
-    return boards, winners
+    move_counts = np.array(move_counts)
+    min_moves = np.min(move_counts)
+    max_moves = np.max(move_counts)
+    normalized_move_counts = (move_counts - min_moves) / \
+        (max_moves - min_moves)
+
+    return boards, winners, normalized_move_counts
 
 
 def _encodeBoard(board: chess.Board):
@@ -94,13 +103,14 @@ def _encodeBoard(board: chess.Board):
     return encodedBoard
 
 
-def _generateDataset(boards, winners):
+def _generateDataset(boards, winners, move_counts):
     print('Generating dataset...')
 
     boards = np.array(boards)
     winners = np.array(winners)
 
-    dataset = tf.data.Dataset.from_tensor_slices((boards, winners))
+    dataset = tf.data.Dataset.from_tensor_slices(
+        (boards, winners, move_counts))
     dataset = dataset.shuffle(1000)
     dataset = dataset.batch(32)
 
@@ -109,6 +119,6 @@ def _generateDataset(boards, winners):
 
 def getData():
     _fetchData()
-    boards, winners = _generateBoards()
-    dataset = _generateDataset(boards, winners)
+    boards, winners, move_counts = _generateBoards()
+    dataset = _generateDataset(boards, winners, move_counts)
     return dataset
