@@ -73,7 +73,7 @@ def _generateBoards():
         board = chess.Board()
         for move in row['moves'].split():
             board.push_san(move)
-            encodedBoard = _encodeBoard(board)
+            encodedBoard = encodeBoard(board)
 
             boards.append(encodedBoard)
             winners.append(winner)
@@ -85,21 +85,34 @@ def _generateBoards():
     move_counts = np.array(move_counts)
     min_moves = np.min(move_counts)
     max_moves = np.max(move_counts)
-    normalized_move_counts = (move_counts - min_moves) / (max_moves - min_moves)
+    normalized_move_counts = (move_counts - min_moves) / \
+        (max_moves - min_moves)
 
     return boards, winners, normalized_move_counts
 
 
-def _encodeBoard(board: chess.Board):
-    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.float32)
+def encodeBoard(board: chess.Board):
+    encodedBoard = np.zeros((8, 8, 12), dtype=np.float32)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece is not None:
-            encodedBoard[chess.square_rank(square)][chess.square_file(
-                square)][PIECE_TO_INDEX[piece.symbol()]] = 1
+            rank, file = divmod(square, 8)
+            encodedBoard[rank, file, PIECE_TO_INDEX[piece.symbol()]] = 1
 
     return encodedBoard
+
+
+def decodeBoard(encodedBoard):
+    board = chess.Board()
+    for rank in range(8):
+        for file in range(8):
+            for piece_index in range(12):
+                if encodedBoard[rank, file, piece_index] == 1:
+                    piece = INDEX_TO_PIECE[piece_index]
+                    board.set_piece_at(chess.square(
+                        file, rank), chess.Piece.from_symbol(piece))
+    return board
 
 
 def _generateDataset(boards, winners, move_counts):
