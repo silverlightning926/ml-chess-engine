@@ -4,7 +4,7 @@ import os
 
 
 def build_model():
-    if os.path.exists('model.h5'):
+    if os.path.exists('model.keras'):
         print('Model already exists. Loading model...')
         model = load_model('model.keras')
 
