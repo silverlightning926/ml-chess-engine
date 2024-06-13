@@ -5,10 +5,10 @@ from keras.api.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, Inpu
 def build_model():
     model = Sequential([
         Input(shape=(8, 8, 12)),
-        Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D((3, 3)),
-        Conv2D(64, (3, 3), activation='relu'),
-        MaxPooling2D((3, 3)),
+        Conv2D(64, (2, 2), activation='relu'),
+        MaxPooling2D((2, 2)),
+        Conv2D(64, (2, 2), activation='relu'),
+        MaxPooling2D((2, 2)),
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.2),
