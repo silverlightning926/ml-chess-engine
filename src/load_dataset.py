@@ -55,8 +55,10 @@ def _generateBoards():
     print('Generating boards...')
     df = _readData()
 
-    boards = []
+    games = []
     winners = []
+
+    max_moves = df['moves'].apply(lambda x: len(x.split())).max()
 
     tqdm.pandas(desc='Processing Data')
 
@@ -70,20 +72,29 @@ def _generateBoards():
             winner = 0
 
         board = chess.Board()
+
+        moves = []
+
         for move in row['moves'].split():
             board.push_san(move)
             encodedBoard = _encodeBoard(board)
 
-            boards.append(encodedBoard)
-            winners.append(winner)
+            moves.append(encodedBoard)
+
+        while len(moves) < max_moves:
+            moves.append(np.zeros(shape=(8, 8, 12), dtype=np.int8))
+
+        moves = np.array(moves, dtype=np.int8)
+        games.append(moves)
+        winners.append(winner)
 
     df.progress_apply(processRow, axis=1)
 
-    return boards, winners
+    return games, winners
 
 
 def _encodeBoard(board: chess.Board):
-    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.float32)
+    encodedBoard = np.zeros(shape=(8, 8, 12), dtype=np.int8)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
@@ -94,14 +105,14 @@ def _encodeBoard(board: chess.Board):
     return encodedBoard
 
 
-def _generateDataset(boards, winners):
+def _generateDataset(games, winners):
     print('Generating dataset...')
 
-    boards = np.array(boards)
-    winners = np.array(winners)
+    games = np.array(games, dtype=np.int8)
+    winners = np.array(winners, dtype=np.int8)
 
-    dataset = tf.data.Dataset.from_tensor_slices((boards, winners))
-    dataset = dataset.shuffle(1000)
+    dataset = tf.data.Dataset.from_tensor_slices((games, winners))
+    dataset = dataset.shuffle(10000)
     dataset = dataset.batch(32)
 
     return dataset
