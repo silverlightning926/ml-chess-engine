@@ -1,6 +1,6 @@
 from keras.api.models import load_model, Sequential
 import chess
-from load_dataset import encodeBoard, decodeBoard
+from training._load_dataset import encodeBoard
 import numpy as np
 from tqdm import tqdm
 
