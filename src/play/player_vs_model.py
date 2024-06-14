@@ -1,10 +1,23 @@
 from keras.api.models import load_model, Sequential
 import chess
-from training._load_dataset import encodeBoard
+from utils.encoding_utils import encodeBoard
 import numpy as np
 from tqdm import tqdm
 
 model: Sequential = load_model('model.keras')
+
+# Cache for legal moves
+legal_moves_cache = {}
+
+
+def get_legal_moves(board: chess.Board):
+    board_key = board.fen()
+    if board_key in legal_moves_cache:
+        return legal_moves_cache[board_key]
+    else:
+        legal_moves = list(board.legal_moves)
+        legal_moves_cache[board_key] = legal_moves
+        return legal_moves
 
 
 def evaluateBoard(board: chess.Board):
@@ -20,9 +33,11 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizin
     if depth == 0 or board.is_game_over():
         return evaluateBoard(board)
 
+    legal_moves = get_legal_moves(board)
+
     if maximizingPlayer:
         maxEval = float('-inf')
-        for move in board.legal_moves:
+        for move in legal_moves:
             board.push(move)
             eval = minimax(board, depth - 1, alpha, beta, False)
             board.pop()
@@ -33,7 +48,7 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizin
         return maxEval
     else:
         minEval = float('inf')
-        for move in board.legal_moves:
+        for move in legal_moves:
             board.push(move)
             eval = minimax(board, depth - 1, alpha, beta, True)
             board.pop()
@@ -47,7 +62,8 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizin
 def minimaxRoot(board: chess.Board, depth: int, maximizingPlayer: bool):
     bestMove = None
     bestEval = float('-inf') if maximizingPlayer else float('inf')
-    for move in tqdm(board.legal_moves, desc="Finding best move", ascii=True, leave=True):
+    legal_moves = get_legal_moves(board)
+    for move in tqdm(legal_moves, desc="Finding best move", ascii=True, leave=True):
         board.push(move)
         eval = minimax(board, depth - 1, float('-inf'),
                        float('inf'), not maximizingPlayer)
@@ -73,7 +89,7 @@ def main():
             move = minimaxMove(board, 2)
         else:
             move = input('Enter your move: ')
-            while chess.Move.from_uci(move) not in board.legal_moves:
+            while chess.Move.from_uci(move) not in get_legal_moves(board):
                 move = input('Enter a legal move: ')
             move = chess.Move.from_uci(move)
 
