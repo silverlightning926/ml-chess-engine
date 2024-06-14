@@ -1,9 +1,10 @@
 import os
 
-from src.utils import find_project_directory
 from keras.api.models import Model, load_model
 from keras.api.layers import Dense, Conv2D, Dropout, Input, BatchNormalization, \
     GlobalAveragePooling2D, LeakyReLU, SpatialDropout2D, Concatenate, SeparableConv2D, Add
+
+from src.utils.path_utils import find_project_directory
 
 
 def build_model():

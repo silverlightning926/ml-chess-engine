@@ -5,7 +5,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils import encode_board
+from src.utils.encoding_utils import encode_board
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
@@ -86,10 +86,14 @@ def _generate_boards():
 
             castling_rights.append(
                 (
-                    1 if board.has_kingside_castling_rights(chess.WHITE) else 0,
-                    1 if board.has_queenside_castling_rights(chess.WHITE) else 0,
-                    1 if board.has_kingside_castling_rights(chess.BLACK) else 0,
-                    1 if board.has_queenside_castling_rights(chess.BLACK) else 0
+                    1 if board.has_kingside_castling_rights(
+                        chess.WHITE) else 0,
+                    1 if board.has_queenside_castling_rights(
+                        chess.WHITE) else 0,
+                    1 if board.has_kingside_castling_rights(
+                        chess.BLACK) else 0,
+                    1 if board.has_queenside_castling_rights(
+                        chess.BLACK) else 0
                 )
             )
 

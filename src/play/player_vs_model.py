@@ -3,7 +3,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils import encode_board
+from src.utils.encoding_utils import encode_board
 
 model: Model = load_model('models/model.keras')
 
