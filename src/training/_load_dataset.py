@@ -2,10 +2,11 @@ import os
 from kaggle.api.kaggle_api_extended import KaggleApi
 import pandas as pd
 import chess
-from src.utils import encode_board
 import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
+
+from src.utils import encode_board
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'

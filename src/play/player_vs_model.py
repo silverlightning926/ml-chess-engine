@@ -1,8 +1,9 @@
 from keras.api.models import load_model, Sequential
 import chess
-from src.utils import encode_board
 import numpy as np
 from tqdm import tqdm
+
+from src.utils import encode_board
 
 model: Sequential = load_model('../../models/model.keras')
 
