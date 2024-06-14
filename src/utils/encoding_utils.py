@@ -20,23 +20,23 @@ INDEX_TO_PIECE = {v: k for k, v in PIECE_TO_INDEX.items()}
 
 
 def encode_board(board: chess.Board):
-    encodedBoard = np.zeros((8, 8, 12), dtype=np.float32)
+    encoded_board = np.zeros((8, 8, 12), dtype=np.float32)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece is not None:
             rank, file = divmod(square, 8)
-            encodedBoard[rank, file, PIECE_TO_INDEX[piece.symbol()]] = 1
+            encoded_board[rank, file, PIECE_TO_INDEX[piece.symbol()]] = 1
 
-    return encodedBoard
+    return encoded_board
 
 
-def decode_board(encodedBoard):
+def decode_board(encoded_board):
     board = chess.Board()
     for rank in range(8):
         for file in range(8):
             for piece_index in range(12):
-                if encodedBoard[rank, file, piece_index] == 1:
+                if encoded_board[rank, file, piece_index] == 1:
                     piece = INDEX_TO_PIECE[piece_index]
                     board.set_piece_at(chess.square(
                         file, rank), chess.Piece.from_symbol(piece))

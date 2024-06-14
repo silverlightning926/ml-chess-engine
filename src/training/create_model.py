@@ -4,8 +4,7 @@ import _train_model as _train_model
 
 
 def main():
-
-    data = _load_dataset.getData()
+    data = _load_dataset.get_data()
     model = _build_model.build_model()
     model = _train_model.fit_model(model, data)
     _train_model.save_model(model, '../../models/model.keras')

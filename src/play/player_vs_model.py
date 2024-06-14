@@ -20,65 +20,65 @@ def get_legal_moves(board: chess.Board):
         return legal_moves
 
 
-def evaluateBoard(board: chess.Board):
-    encodedBoard = encode_board(board)
-    encodedBoard = np.reshape(encodedBoard, (1, 8, 8, 12))
-    prediction = model.predict(encodedBoard, verbose=0, batch_size=1)
+def evaluate_board(board: chess.Board):
+    encoded_board = encode_board(board)
+    encoded_board = np.reshape(encoded_board, (1, 8, 8, 12))
+    prediction = model.predict(encoded_board, verbose=0, batch_size=1)
     prediction = prediction[0][0]
     prediction = np.clip(prediction, -1, 1)
     return prediction
 
 
-def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizingPlayer: bool):
+def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizing_player: bool):
     if depth == 0 or board.is_game_over():
-        return evaluateBoard(board)
+        return evaluate_board(board)
 
     legal_moves = get_legal_moves(board)
 
-    if maximizingPlayer:
-        maxEval = float('-inf')
+    if maximizing_player:
+        max_eval = float('-inf')
         for move in legal_moves:
             board.push(move)
-            eval = minimax(board, depth - 1, alpha, beta, False)
+            evaluation = minimax(board, depth - 1, alpha, beta, False)
             board.pop()
-            maxEval = max(maxEval, eval)
-            alpha = max(alpha, eval)
+            max_eval = max(max_eval, evaluation)
+            alpha = max(alpha, evaluation)
             if beta <= alpha:
                 break
-        return maxEval
+        return max_eval
     else:
-        minEval = float('inf')
+        min_eval = float('inf')
         for move in legal_moves:
             board.push(move)
-            eval = minimax(board, depth - 1, alpha, beta, True)
+            evaluation = minimax(board, depth - 1, alpha, beta, True)
             board.pop()
-            minEval = min(minEval, eval)
-            beta = min(beta, eval)
+            min_eval = min(min_eval, evaluation)
+            beta = min(beta, evaluation)
             if beta <= alpha:
                 break
-        return minEval
+        return min_eval
 
 
-def minimaxRoot(board: chess.Board, depth: int, maximizingPlayer: bool):
-    bestMove = None
-    bestEval = float('-inf') if maximizingPlayer else float('inf')
+def minimax_root(board: chess.Board, depth: int, maximizing_player: bool):
+    best_move = None
+    best_eval = float('-inf') if maximizing_player else float('inf')
     legal_moves = get_legal_moves(board)
     for move in tqdm(legal_moves, desc="Finding best move", ascii=True, leave=True):
         board.push(move)
-        eval = minimax(board, depth - 1, float('-inf'),
-                       float('inf'), not maximizingPlayer)
+        evaluation = minimax(board, depth - 1, float('-inf'),
+                             float('inf'), not maximizing_player)
         board.pop()
-        if maximizingPlayer and eval > bestEval:
-            bestEval = eval
-            bestMove = move
-        elif not maximizingPlayer and eval < bestEval:
-            bestEval = eval
-            bestMove = move
-    return bestMove
+        if maximizing_player and evaluation > best_eval:
+            best_eval = evaluation
+            best_move = move
+        elif not maximizing_player and evaluation < best_eval:
+            best_eval = evaluation
+            best_move = move
+    return best_move
 
 
-def minimaxMove(board: chess.Board, depth: int):
-    return minimaxRoot(board, depth, board.turn)
+def minimax_move(board: chess.Board, depth: int):
+    return minimax_root(board, depth, board.turn)
 
 
 def main():
@@ -86,7 +86,7 @@ def main():
 
     while not board.is_game_over():
         if board.turn:
-            move = minimaxMove(board, 2)
+            move = minimax_move(board, 2)
         else:
             move = input('Enter your move: ')
             while chess.Move.from_uci(move) not in get_legal_moves(board):

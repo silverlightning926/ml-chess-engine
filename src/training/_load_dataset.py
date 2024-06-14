@@ -10,7 +10,6 @@ from tqdm import tqdm
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
 
-
 api = KaggleApi()
 
 
@@ -22,7 +21,7 @@ def _download_data(dataset: str, path: str = 'data'):
     api.dataset_download_files(dataset, path=path, unzip=True)
 
 
-def _fetchData():
+def _fetch_data():
     if os.path.exists('data'):
         print('Data already downloaded. Skipping download.')
         return
@@ -32,13 +31,13 @@ def _fetchData():
     print('Data downloaded successfully.')
 
 
-def _readData():
+def _read_data():
     print('Reading data...')
     df = pd.read_csv(DATASET_PATH)
     return df
 
 
-def _generateBoards():
+def _generate_boards():
     print('Generating boards...')
 
     if os.path.exists(PREPROCESSED_DATA_PATH):
@@ -46,7 +45,7 @@ def _generateBoards():
         data = np.load(PREPROCESSED_DATA_PATH)
         return data['boards'], data['winners'], data['move_counts']
 
-    df = _readData()
+    df = _read_data()
 
     boards = []
     winners = []
@@ -54,7 +53,7 @@ def _generateBoards():
 
     tqdm.pandas(desc='Processing Data')
 
-    def processRow(row):
+    def process_row(row):
         winner = row['winner']
         if winner == 'white':
             winner = 1
@@ -66,20 +65,20 @@ def _generateBoards():
         board = chess.Board()
         for move in row['moves'].split():
             board.push_san(move)
-            encodedBoard = encode_board(board)
+            encoded_board = encode_board(board)
 
-            boards.append(encodedBoard)
+            boards.append(encoded_board)
             winners.append(winner)
 
             move_counts.append(board.fullmove_number)
 
-    df.progress_apply(processRow, axis=1)
+    df.progress_apply(process_row, axis=1)
 
     move_counts = np.array(move_counts)
     min_moves = np.min(move_counts)
     max_moves = np.max(move_counts)
     normalized_move_counts = (move_counts - min_moves) / \
-        (max_moves - min_moves)
+                             (max_moves - min_moves)
 
     np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
                         winners=winners, move_counts=move_counts)
@@ -87,7 +86,7 @@ def _generateBoards():
     return boards, winners, normalized_move_counts
 
 
-def _generateDataset(boards, winners, move_counts):
+def _generate_dataset(boards, winners, move_counts):
     print('Generating dataset...')
 
     boards = np.array(boards)
@@ -103,8 +102,8 @@ def _generateDataset(boards, winners, move_counts):
     return dataset
 
 
-def getData():
-    _fetchData()
-    boards, winners, move_counts = _generateBoards()
-    dataset = _generateDataset(boards, winners, move_counts)
+def get_data():
+    _fetch_data()
+    boards, winners, move_counts = _generate_boards()
+    dataset = _generate_dataset(boards, winners, move_counts)
     return dataset
