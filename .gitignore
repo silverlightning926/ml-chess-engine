@@ -125,3 +125,6 @@ dmypy.json
 
 # Data
 data/
+
+# Idea
+/.idea
