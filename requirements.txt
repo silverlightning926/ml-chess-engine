@@ -1,0 +1,5 @@
+chess==1.10.0
+keras==3.3.3
+numpy==1.26.4
+tqdm==4.66.4
+training==0.0.1
