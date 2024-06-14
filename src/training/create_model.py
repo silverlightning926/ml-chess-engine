@@ -1,6 +1,6 @@
-import training._load_dataset as _load_dataset
-import training._build_model as _build_model
-import training._train_model as _train_model
+import _load_dataset
+import _build_model as _build_model
+import _train_model as _train_model
 
 
 def main():
