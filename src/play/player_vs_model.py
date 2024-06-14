@@ -1,11 +1,11 @@
-from keras.api.models import load_model, Sequential
+from keras.api.models import load_model, Model
 import chess
 import numpy as np
 from tqdm import tqdm
 
 from src.utils import encode_board
 
-model: Sequential = load_model('../../models/model.keras')
+model: Model = load_model('models/model.keras')
 
 # Cache for legal moves
 legal_moves_cache = {}

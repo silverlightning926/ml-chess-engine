@@ -1,14 +1,16 @@
 import os
 
-from keras.api.models import Sequential, load_model
+from src.utils import find_project_directory
 from keras.api.layers import Dense, Conv2D, Dropout, Input, BatchNormalization, \
     GlobalAveragePooling2D, LeakyReLU, SpatialDropout2D
 
 
 def build_model():
-    if os.path.exists('../../models/model.keras'):
+    project_dir = find_project_directory()
+
+    if os.path.exists(os.path.join(project_dir, 'models/model.keras')):
         print('Model already exists. Loading model...')
-        model = load_model('../../models/model.keras')
+        model = load_model('models/model.keras')
 
     else:
         model = Sequential([
