@@ -1,8 +1,8 @@
 import os
 
 from keras.api.models import Sequential, load_model
-from keras.api.layers import Dense, Conv2D, Dropout, Input, BatchNormalization, GlobalAveragePooling2D, \
-    LeakyReLU, SpatialDropout2D
+from keras.api.layers import Dense, Conv2D, Dropout, Input, BatchNormalization, \
+    GlobalAveragePooling2D, LeakyReLU, SpatialDropout2D
 
 
 def build_model():
