@@ -1,5 +1,8 @@
 chess==1.10.0
+kaggle==1.6.14
 keras==3.3.3
 numpy==1.26.4
+pandas==2.2.2
+tensorflow==2.16.1
+tensorflow_intel==2.16.1
 tqdm==4.66.4
-training==0.0.1
