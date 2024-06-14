@@ -21,7 +21,7 @@ def get_legal_moves(board: chess.Board):
 
 
 def evaluateBoard(board: chess.Board):
-    encodedBoard = encodeBoard(board)
+    encodedBoard = encode_board(board)
     encodedBoard = np.reshape(encodedBoard, (1, 8, 8, 12))
     prediction = model.predict(encodedBoard, verbose=0, batch_size=1)
     prediction = prediction[0][0]

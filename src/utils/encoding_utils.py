@@ -19,7 +19,7 @@ PIECE_TO_INDEX = {
 INDEX_TO_PIECE = {v: k for k, v in PIECE_TO_INDEX.items()}
 
 
-def encodeBoard(board: chess.Board):
+def encode_board(board: chess.Board):
     encodedBoard = np.zeros((8, 8, 12), dtype=np.float32)
 
     for square in chess.SQUARES:
@@ -31,7 +31,7 @@ def encodeBoard(board: chess.Board):
     return encodedBoard
 
 
-def decodeBoard(encodedBoard):
+def decode_board(encodedBoard):
     board = chess.Board()
     for rank in range(8):
         for file in range(8):

@@ -66,7 +66,7 @@ def _generateBoards():
         board = chess.Board()
         for move in row['moves'].split():
             board.push_san(move)
-            encodedBoard = encodeBoard(board)
+            encodedBoard = encode_board(board)
 
             boards.append(encodedBoard)
             winners.append(winner)
