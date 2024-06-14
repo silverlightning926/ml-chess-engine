@@ -4,7 +4,7 @@ import os
 
 
 def build_model():
-    if os.path.exists('model.keras'):
+    if os.path.exists('../../models/model.keras'):
         print('Model already exists. Loading model...')
         model = load_model('../../models/model.keras')
 

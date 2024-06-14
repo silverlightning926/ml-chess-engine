@@ -4,7 +4,7 @@ from utils.encoding_utils import encodeBoard
 import numpy as np
 from tqdm import tqdm
 
-model: Sequential = load_model('model.keras')
+model: Sequential = load_model('../../models/model.keras')
 
 # Cache for legal moves
 legal_moves_cache = {}
