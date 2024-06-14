@@ -71,7 +71,7 @@ def _generate_boards():
             boards.append(encoded_board)
             winners.append(winner)
 
-            move_counts.append(board.fullmove_number)
+            move_counts.append(board.fullmove_number)  # pylint: disable=no-member
 
     df.progress_apply(process_row, axis=1)
 

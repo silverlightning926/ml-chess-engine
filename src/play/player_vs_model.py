@@ -15,10 +15,10 @@ def get_legal_moves(board: chess.Board):
     board_key = board.fen()
     if board_key in legal_moves_cache:
         return legal_moves_cache[board_key]
-    else:
-        legal_moves = list(board.legal_moves)
-        legal_moves_cache[board_key] = legal_moves
-        return legal_moves
+
+    legal_moves = list(board.legal_moves)
+    legal_moves_cache[board_key] = legal_moves
+    return legal_moves
 
 
 def evaluate_board(board: chess.Board):
@@ -47,17 +47,17 @@ def minimax(board: chess.Board, depth: int, alpha: float, beta: float, maximizin
             if beta <= alpha:
                 break
         return max_eval
-    else:
-        min_eval = float('inf')
-        for move in legal_moves:
-            board.push(move)
-            evaluation = minimax(board, depth - 1, alpha, beta, True)
-            board.pop()
-            min_eval = min(min_eval, evaluation)
-            beta = min(beta, evaluation)
-            if beta <= alpha:
-                break
-        return min_eval
+
+    min_eval = float('inf')
+    for move in legal_moves:
+        board.push(move)
+        evaluation = minimax(board, depth - 1, alpha, beta, True)
+        board.pop()
+        min_eval = min(min_eval, evaluation)
+        beta = min(beta, evaluation)
+        if beta <= alpha:
+            break
+    return min_eval
 
 
 def minimax_root(board: chess.Board, depth: int, maximizing_player: bool):

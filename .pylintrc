@@ -1,2 +1,3 @@
-[pylint.messages_control]
-disable = missing-function-docstring
+[MAIN]
+
+disable=missing-function-docstring,missing-module-docstring,import-error
