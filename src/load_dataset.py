@@ -7,6 +7,7 @@ import tensorflow as tf
 from tqdm import tqdm
 
 DATASET_PATH = 'data/games.csv'
+PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
 PIECE_TO_INDEX = {
     'p': 0,
     'r': 1,
@@ -53,6 +54,12 @@ def _readData():
 
 def _generateBoards():
     print('Generating boards...')
+
+    if os.path.exists(PREPROCESSED_DATA_PATH):
+        print('Preprocessed data found. Loading...')
+        data = np.load(PREPROCESSED_DATA_PATH)
+        return data['boards'], data['winners'], data['move_counts']
+
     df = _readData()
 
     boards = []
@@ -87,6 +94,9 @@ def _generateBoards():
     max_moves = np.max(move_counts)
     normalized_move_counts = (move_counts - min_moves) / \
         (max_moves - min_moves)
+
+    np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
+                        winners=winners, move_counts=move_counts)
 
     return boards, winners, normalized_move_counts
 
@@ -125,6 +135,8 @@ def _generateDataset(boards, winners, move_counts):
         (boards, winners, move_counts))
     dataset = dataset.shuffle(1000)
     dataset = dataset.batch(32)
+
+    dataset.prefetch(tf.data.experimental.AUTOTUNE).cache()
 
     return dataset
 
