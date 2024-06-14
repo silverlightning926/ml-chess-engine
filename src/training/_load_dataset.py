@@ -2,7 +2,7 @@ import os
 from kaggle.api.kaggle_api_extended import KaggleApi
 import pandas as pd
 import chess
-from utils.encoding_utils import encodeBoard
+from src.utils import encode_board
 import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
