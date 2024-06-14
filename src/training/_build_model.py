@@ -6,7 +6,7 @@ import os
 def build_model():
     if os.path.exists('model.keras'):
         print('Model already exists. Loading model...')
-        model = load_model('model.keras')
+        model = load_model('../../models/model.keras')
 
     else:
         model = Sequential([
