@@ -41,3 +41,72 @@ def decode_board(encoded_board):
                     board.set_piece_at(chess.square(
                         file, rank), chess.Piece.from_symbol(piece))
     return board
+
+
+def encode_winner(winner: str):
+    if winner == 'white':
+        return 1
+    elif winner == 'black':
+        return -1
+    else:
+        return 0
+
+
+def encode_castling_rights(board: chess.Board):
+    return (
+        board.has_kingside_castling_rights(chess.WHITE),
+        board.has_queenside_castling_rights(chess.WHITE),
+        board.has_kingside_castling_rights(chess.BLACK),
+        board.has_queenside_castling_rights(chess.BLACK)
+    )
+
+
+def encode_has_castled(board: chess.Board):
+    has_white_king_castled = False
+    has_white_queen_castled = False
+    has_black_king_castled = False
+    has_black_queen_castled = False
+
+    for move in board.move_stack:
+        if board.is_castling(move):
+            if board.is_kingside_castling(move):
+                if board.turn:
+                    has_white_king_castled = True
+                else:
+                    has_black_king_castled = True
+
+            if board.is_queenside_castling(move):
+                if board.turn:
+                    has_white_queen_castled = True
+                else:
+                    has_black_queen_castled = True
+
+    return (
+        has_white_king_castled,
+        has_white_queen_castled,
+        has_black_king_castled,
+        has_black_queen_castled
+    )
+
+
+def encode_to_move(board: chess.Board):
+    return (1 if board.turn else 0, 1 if not board.turn else 0)
+
+
+def encode_move_count(board: chess.Board):
+    return board.fullmove_number
+
+
+def encode_material(board: chess.Board):
+    return (
+        len(board.pieces(chess.PAWN, chess.WHITE)),
+        len(board.pieces(chess.KNIGHT, chess.WHITE)),
+        len(board.pieces(chess.BISHOP, chess.WHITE)),
+        len(board.pieces(chess.ROOK, chess.WHITE)),
+        len(board.pieces(chess.QUEEN, chess.WHITE)),
+        len(board.pieces(chess.PAWN, chess.BLACK)),
+        len(board.pieces(chess.KNIGHT, chess.BLACK)),
+        len(board.pieces(chess.BISHOP, chess.BLACK)),
+        len(board.pieces(chess.ROOK, chess.BLACK)),
+        len(board.pieces(chess.QUEEN, chess.BLACK))
+    )

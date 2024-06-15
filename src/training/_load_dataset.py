@@ -5,7 +5,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils.encoding_utils import encode_board
+from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_has_castled, encode_to_move, encode_material, encode_winner
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
@@ -59,20 +59,9 @@ def _generate_boards():
     tqdm.pandas(desc='Processing Data')
 
     def process_row(row):
-        winner = row['winner']
-        if winner == 'white':
-            winner = 1
-        elif winner == 'black':
-            winner = -1
-        else:
-            winner = 0
+        winner = encode_winner(row['winner'])
 
         board = chess.Board()
-
-        white_king_castled = False
-        white_queen_castled = False
-        black_king_castled = False
-        black_queen_castled = False
 
         for move in row['moves'].split():
             board.push_san(move)
@@ -81,60 +70,22 @@ def _generate_boards():
             boards.append(encoded_board)
             winners.append(winner)
 
-            turn = board.turn
-            to_move.append((1 if turn else 0, 1 if not turn else 0))
-
-            castling_rights.append(
-                (
-                    1 if board.has_kingside_castling_rights(
-                        chess.WHITE) else 0,
-                    1 if board.has_queenside_castling_rights(
-                        chess.WHITE) else 0,
-                    1 if board.has_kingside_castling_rights(
-                        chess.BLACK) else 0,
-                    1 if board.has_queenside_castling_rights(
-                        chess.BLACK) else 0
-                )
+            to_move.append(
+                encode_to_move(board)
             )
 
-            move = board.peek()
-
-            if white_king_castled is not True:
-                white_king_castled = board.is_kingside_castling(move)
-
-            if white_queen_castled is not True:
-                white_queen_castled = board.is_queenside_castling(move)
-
-            if black_king_castled is not True:
-                black_king_castled = board.is_kingside_castling(move)
-
-            if black_queen_castled is not True:
-                black_queen_castled = board.is_queenside_castling(move)
+            castling_rights.append(
+                encode_castling_rights(board)
+            )
 
             has_castled.append(
-                (
-                    1 if white_king_castled else 0,
-                    1 if white_queen_castled else 0,
-                    1 if black_king_castled else 0,
-                    1 if black_queen_castled else 0
-                )
+                encode_has_castled(board)
             )
 
             move_counts.append(board.fullmove_number)
 
             material.append(
-                (
-                    len(board.pieces(chess.PAWN, chess.WHITE)),
-                    len(board.pieces(chess.KNIGHT, chess.WHITE)),
-                    len(board.pieces(chess.BISHOP, chess.WHITE)),
-                    len(board.pieces(chess.ROOK, chess.WHITE)),
-                    len(board.pieces(chess.QUEEN, chess.WHITE)),
-                    len(board.pieces(chess.PAWN, chess.BLACK)),
-                    len(board.pieces(chess.KNIGHT, chess.BLACK)),
-                    len(board.pieces(chess.BISHOP, chess.BLACK)),
-                    len(board.pieces(chess.ROOK, chess.BLACK)),
-                    len(board.pieces(chess.QUEEN, chess.BLACK))
-                )
+                encode_material(board)
             )
 
     df.progress_apply(process_row, axis=1)
