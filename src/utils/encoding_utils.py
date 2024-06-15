@@ -78,7 +78,7 @@ def encode_castling_rights(board: chess.Board):
 
 
 def encode_to_move(board: chess.Board):
-    return board.turn
+    return int(board.turn)
 
 
 def encode_move_count(board: chess.Board):

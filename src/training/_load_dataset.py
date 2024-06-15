@@ -37,7 +37,7 @@ def _read_data():
     return df
 
 
-def _generate_boards():
+def _generate_game_sequences():
     print('Generating boards...')
 
     if os.path.exists(PREPROCESSED_DATA_PATH):
@@ -58,51 +58,41 @@ def _generate_boards():
     tqdm.pandas(desc='Processing Data')
 
     def process_row(row):
-        winner = encode_winner(row['winner'])
-
         board = chess.Board()
 
         for move in row['moves'].split():
             board.push_san(move)
+
             encoded_board = encode_board(board)
+            encoded_castling = encode_castling_rights(board)
+            encoded_to_move = encode_to_move(board)
+            encoded_material = encode_material_advantage(board)
+            encoded_move_count = encode_move_count(board)
+            encoded_is_checked = encode_is_checked(board)
 
             boards.append(encoded_board)
-            winners.append(winner)
-
-            to_move.append(encode_to_move(board))
-
-            castling_rights.append(encode_castling_rights(board))
-
-            move_counts.append(encode_move_count(board))
-
-            material.append(encode_material_advantage(board))
-
-            is_checked.append(encode_is_checked(board))
+            winners.append(encode_winner(row['winner']))
+            move_counts.append(encoded_move_count)
+            to_move.append(encoded_to_move)
+            castling_rights.append(encoded_castling)
+            material.append(encoded_material)
+            is_checked.append(encoded_is_checked)
 
     df.progress_apply(process_row, axis=1)
 
     move_counts = np.array(move_counts)
     min_moves = np.min(move_counts)
     max_moves = np.max(move_counts)
-    normalized_move_counts = (move_counts - min_moves) / \
-                             (max_moves - min_moves)
+    move_counts = (move_counts - min_moves) / \
+        (max_moves - min_moves)
 
     np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
                         winners=winners, move_counts=move_counts, to_move=to_move, castling_rights=castling_rights, material=material, is_checked=is_checked)
 
-    return boards, winners, normalized_move_counts, to_move, castling_rights, material, is_checked
+    return np.array(boards, dtype=np.float32), np.array(winners, dtype=np.float32), np.array(move_counts, dtype=np.float32), np.array(to_move, dtype=np.float32), np.array(castling_rights, dtype=np.float32), np.array(material, dtype=np.float32), np.array(is_checked, dtype=np.float32)
 
 
 def get_data():
     _fetch_data()
 
-    boards, winners, move_counts, to_move, castling_rights, material, is_checked = _generate_boards()
-
-    boards = np.array(boards)
-    winners = np.array(winners)
-    move_counts = np.array(move_counts)
-    to_move = np.array(to_move)
-    castling_rights = np.array(castling_rights)
-    material = np.array(material)
-
-    return boards, move_counts, to_move, castling_rights, material, is_checked, winners
+    return _generate_game_sequences()
