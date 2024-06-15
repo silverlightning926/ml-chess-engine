@@ -43,7 +43,7 @@ def _generate_boards():
     if os.path.exists(PREPROCESSED_DATA_PATH):
         print('Preprocessed data found. Loading...')
         data = np.load(PREPROCESSED_DATA_PATH)
-        return data['boards'], data['winners'], data['move_counts'], data['to_move'], data['castling_rights'], data['material']
+        return data['boards'], data['winners'], data['move_counts'], data['to_move'], data['castling_rights'], data['material'], data['is_checked']
 
     df = _read_data()
 
@@ -88,7 +88,7 @@ def _generate_boards():
                              (max_moves - min_moves)
 
     np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
-                        winners=winners, move_counts=move_counts, to_move=to_move, castling_rights=castling_rights, material=material)
+                        winners=winners, move_counts=move_counts, to_move=to_move, castling_rights=castling_rights, material=material, is_checked=is_checked)
 
     return boards, winners, normalized_move_counts, to_move, castling_rights, material, is_checked
 
