@@ -7,7 +7,7 @@ def main():
     data = get_data()
     print(data)
     model = build_model()
-    model = fit_model(model, data, verbose=1, batch_size=16)
+    model = fit_model(model, data, verbose=1)
     save_model(model, 'models/model.keras')
 
 

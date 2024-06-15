@@ -7,10 +7,14 @@ from tqdm import tqdm
 import tensorflow as tf
 from sys import getsizeof
 
-from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_winner, encode_move_count, encode_is_checked
+from src.utils.encoding_utils import encode_board, encode_winner
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
+
+MAX_MOVES = 75
+
+BATCH_SIZE = 1
 
 api = KaggleApi()
 
@@ -34,7 +38,7 @@ def _fetch_data():
 
 
 def _read_data():
-    print('Reading data...')
+    print('Reading CSV...')
     df = pd.read_csv(DATASET_PATH)
     return df
 
@@ -47,9 +51,15 @@ def _generate_game_sequences():
         data = np.load(PREPROCESSED_DATA_PATH)
         return data['games'], data['winners']
 
+    print('Creating DataFrame...')
     df = _read_data()
+    print(df.head())
 
-    max_moves = df['moves'].apply(lambda x: len(x.split())).max()
+    if MAX_MOVES is not None:
+        print('Removing games that are too long...')
+        df = df[df['moves'].apply(lambda x: len(x.split())) <= MAX_MOVES]
+
+    longest_game = df['moves'].apply(lambda x: len(x.split())).max()
 
     games = []
     winners = []
@@ -66,10 +76,10 @@ def _generate_game_sequences():
             board.push_san(move)
             moves.append(encode_board(board))
 
-        for _ in range(max_moves - len(row['moves'].split())):
-            moves.append(np.zeros((8, 8, 12), dtype=np.float16))
+        for _ in range(longest_game - len(row['moves'].split())):
+            moves.append(np.zeros((8, 8, 12), dtype=np.float32))
 
-        games.append(np.array(moves, dtype=np.float16))
+        games.append(np.array(moves, dtype=np.float32))
         winners.append(encode_winner(row['winner']))
 
     df.progress_apply(process_row, axis=1)
@@ -83,8 +93,8 @@ def _generate_game_sequences():
     print('Preprocessed data saved.')
 
     print('Creating numpy arrays...')
-    games = np.array(games, dtype=np.float16)
-    winners = np.array(winners, dtype=np.float16)
+    games = np.array(games, dtype=np.float32)
+    winners = np.array(winners, dtype=np.float32)
     print('Numpy arrays created.')
 
     return games, winners
@@ -93,7 +103,7 @@ def _generate_game_sequences():
 def _generate_dataset(games, winners, ):
     print('Generating dataset...')
     return tf.data.Dataset.from_tensor_slices((games, winners)).shuffle(
-        10000).batch(16).prefetch(tf.data.experimental.AUTOTUNE)
+        10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
 
 
 def get_data():

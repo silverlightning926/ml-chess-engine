@@ -1,9 +1,26 @@
 import os
-from keras.api.models import Sequential, load_model
-from keras.api.layers import Dense, Conv2D, Dropout, Input, BatchNormalization, \
-    GlobalAveragePooling2D, LeakyReLU, SpatialDropout2D, Concatenate, SeparableConv2D, Add, TimeDistributed, LSTM
-
+from keras.api.models import Model, load_model
+from keras.api.layers import Input, Conv2D, BatchNormalization, LeakyReLU, \
+    GlobalAveragePooling2D, Dense, Dropout, TimeDistributed, GRU, Add, LayerNormalization, MultiHeadAttention
+from keras.api.optimizers import Adam
+from keras.api.regularizers import l2
 from src.utils.path_utils import find_project_directory
+
+from src.training._load_dataset import MAX_MOVES, BATCH_SIZE
+
+
+def time_distributed_residual_block(x, filters, kernel_size):
+    shortcut = x
+    x = TimeDistributed(Conv2D(filters, kernel_size,
+                        padding='same', kernel_regularizer=l2(1e-4)))(x)
+    x = TimeDistributed(BatchNormalization())(x)
+    x = TimeDistributed(LeakyReLU())(x)
+    x = TimeDistributed(Conv2D(filters, kernel_size,
+                        padding='same', kernel_regularizer=l2(1e-4)))(x)
+    x = TimeDistributed(BatchNormalization())(x)
+    x = Add()([shortcut, x])
+    x = TimeDistributed(LeakyReLU())(x)
+    return x
 
 
 def build_model():
@@ -12,42 +29,44 @@ def build_model():
     if os.path.exists(os.path.join(project_dir, 'models/model.keras')):
         print('Model already exists. Loading model...')
         model = load_model('models/model.keras')
-
     else:
         print('Model not found. Building model...')
-        model = Sequential(layers=[
-            Input(shape=(None, 8, 8, 12)),
-            TimeDistributed(SeparableConv2D(128, (3, 3), padding='same',
-                            activation='relu')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(LeakyReLU()),
 
-            TimeDistributed(SeparableConv2D(128, (3, 3), padding='same',
-                            activation='relu')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(LeakyReLU()),
+        input_layer = Input(shape=(MAX_MOVES, 8, 8, 12),
+                            batch_size=BATCH_SIZE, name='input')
 
-            TimeDistributed(SeparableConv2D(128, (3, 3), padding='same',
-                            activation='relu')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(LeakyReLU()),
+        x = TimeDistributed(Conv2D(64, (3, 3), padding='same',
+                            kernel_regularizer=l2(1e-4)))(input_layer)
+        x = TimeDistributed(BatchNormalization())(x)
+        x = TimeDistributed(LeakyReLU())(x)
 
-            TimeDistributed(GlobalAveragePooling2D()),
+        x = time_distributed_residual_block(x, 64, (3, 3))
+        x = time_distributed_residual_block(x, 64, (3, 3))
 
-            LSTM(256, return_sequences=True),
-            LSTM(256, return_sequences=True),
+        x = TimeDistributed(GlobalAveragePooling2D())(x)
 
-            Dense(128, activation='relu'),
-            Dropout(0.5),
+        x = GRU(256, return_sequences=True,
+                kernel_regularizer=l2(1e-4), stateful=False)(x)
+        x = GRU(256, return_sequences=True,
+                kernel_regularizer=l2(1e-4), stateful=False)(x)
 
-            Dense(128, activation='relu'),
-            Dropout(0.5),
+        attention_output = MultiHeadAttention(
+            num_heads=4, key_dim=256, )(x, x)
+        x = Add()([x, attention_output])
+        x = LayerNormalization()(x)
 
-            Dense(1, activation='tanh')
-        ])
+        x = Dense(128, activation='relu', kernel_regularizer=l2(1e-4))(x)
+        x = Dropout(0.5)(x)
+        x = Dense(128, activation='relu', kernel_regularizer=l2(1e-4))(x)
+        x = Dropout(0.5)(x)
+
+        output_layer = Dense(1, activation='tanh',
+                             kernel_regularizer=l2(1e-4))(x)
+
+        model = Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(
-            optimizer='adam',
+            optimizer=Adam(learning_rate=1e-4),
             loss='mean_squared_error',
             metrics=['accuracy']
         )

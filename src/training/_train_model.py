@@ -1,9 +1,11 @@
+from src.training._load_dataset import BATCH_SIZE
+
 import tensorflow as tf
 from keras.api.models import Model
 from keras.api.callbacks import EarlyStopping, ReduceLROnPlateau
 
 
-def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=32, verbose=1):
+def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=BATCH_SIZE, verbose=1):
     early_stopping = EarlyStopping(
         monitor='loss', patience=5, restore_best_weights=True)
     reduce_lr = ReduceLROnPlateau(
