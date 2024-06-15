@@ -5,7 +5,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_winner, encode_move_count
+from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_winner, encode_move_count, encode_is_checked
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
@@ -53,6 +53,7 @@ def _generate_boards():
     to_move = []
     castling_rights = []
     material = []
+    is_checked = []
 
     tqdm.pandas(desc='Processing Data')
 
@@ -76,6 +77,8 @@ def _generate_boards():
 
             material.append(encode_material_advantage(board))
 
+            is_checked.append(encode_is_checked(board))
+
     df.progress_apply(process_row, axis=1)
 
     move_counts = np.array(move_counts)
@@ -87,13 +90,13 @@ def _generate_boards():
     np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
                         winners=winners, move_counts=move_counts, to_move=to_move, castling_rights=castling_rights, material=material)
 
-    return boards, winners, normalized_move_counts, to_move, castling_rights, material
+    return boards, winners, normalized_move_counts, to_move, castling_rights, material, is_checked
 
 
 def get_data():
     _fetch_data()
 
-    boards, winners, move_counts, to_move, castling_rights, material = _generate_boards()
+    boards, winners, move_counts, to_move, castling_rights, material, is_checked = _generate_boards()
 
     boards = np.array(boards)
     winners = np.array(winners)
@@ -102,4 +105,4 @@ def get_data():
     castling_rights = np.array(castling_rights)
     material = np.array(material)
 
-    return boards, move_counts, to_move, castling_rights, material, winners
+    return boards, move_counts, to_move, castling_rights, material, is_checked, winners

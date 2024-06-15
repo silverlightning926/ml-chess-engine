@@ -9,10 +9,10 @@ def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=3
     reduce_lr = ReduceLROnPlateau(
         monitor='loss', factor=0.2, patience=3, min_lr=0.0001)
 
-    boards, move_counts, to_move, castling_rights, material, winners = train_data
+    boards, move_counts, to_move, castling_rights, material, is_checked, winners = train_data
 
     model.fit(
-        x=[boards, move_counts, to_move, castling_rights, material],
+        x=[boards, move_counts, to_move, castling_rights, material, is_checked],
         y=winners,
         epochs=epochs,
         batch_size=batch_size,
