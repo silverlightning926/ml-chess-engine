@@ -5,8 +5,9 @@ from src.training._train_model import fit_model, save_model
 
 def main():
     data = get_data()
+    print(data)
     model = build_model()
-    model = fit_model(model, data)
+    model = fit_model(model, data, verbose=1, batch_size=16)
     save_model(model, 'models/model.keras')
 
 

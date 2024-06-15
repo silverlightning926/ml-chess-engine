@@ -4,6 +4,8 @@ import pandas as pd
 import chess
 import numpy as np
 from tqdm import tqdm
+import tensorflow as tf
+from sys import getsizeof
 
 from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_winner, encode_move_count, encode_is_checked
 
@@ -43,56 +45,60 @@ def _generate_game_sequences():
     if os.path.exists(PREPROCESSED_DATA_PATH):
         print('Preprocessed data found. Loading...')
         data = np.load(PREPROCESSED_DATA_PATH)
-        return data['boards'], data['winners'], data['move_counts'], data['to_move'], data['castling_rights'], data['material'], data['is_checked']
+        return data['games'], data['winners']
 
     df = _read_data()
 
-    boards = []
+    max_moves = df['moves'].apply(lambda x: len(x.split())).max()
+
+    games = []
     winners = []
-    move_counts = []
-    to_move = []
-    castling_rights = []
-    material = []
-    is_checked = []
 
     tqdm.pandas(desc='Processing Data')
 
     def process_row(row):
+        moves = []
+
         board = chess.Board()
 
         for move in row['moves'].split():
+
             board.push_san(move)
+            moves.append(encode_board(board))
 
-            encoded_board = encode_board(board)
-            encoded_castling = encode_castling_rights(board)
-            encoded_to_move = encode_to_move(board)
-            encoded_material = encode_material_advantage(board)
-            encoded_move_count = encode_move_count(board)
-            encoded_is_checked = encode_is_checked(board)
+        for _ in range(max_moves - len(row['moves'].split())):
+            moves.append(np.zeros((8, 8, 12), dtype=np.float16))
 
-            boards.append(encoded_board)
-            winners.append(encode_winner(row['winner']))
-            move_counts.append(encoded_move_count)
-            to_move.append(encoded_to_move)
-            castling_rights.append(encoded_castling)
-            material.append(encoded_material)
-            is_checked.append(encoded_is_checked)
+        games.append(np.array(moves, dtype=np.float16))
+        winners.append(encode_winner(row['winner']))
 
     df.progress_apply(process_row, axis=1)
 
-    move_counts = np.array(move_counts)
-    min_moves = np.min(move_counts)
-    max_moves = np.max(move_counts)
-    move_counts = (move_counts - min_moves) / \
-        (max_moves - min_moves)
+    print(f'Size of games: {getsizeof(games)} bytes')
+    print(f'Size of winners: {getsizeof(winners)} bytes')
 
-    np.savez_compressed(PREPROCESSED_DATA_PATH, boards=boards,
-                        winners=winners, move_counts=move_counts, to_move=to_move, castling_rights=castling_rights, material=material, is_checked=is_checked)
+    print('Saving preprocessed data...')
+    np.savez_compressed(PREPROCESSED_DATA_PATH, games=games,
+                        winners=winners)
+    print('Preprocessed data saved.')
 
-    return np.array(boards, dtype=np.float32), np.array(winners, dtype=np.float32), np.array(move_counts, dtype=np.float32), np.array(to_move, dtype=np.float32), np.array(castling_rights, dtype=np.float32), np.array(material, dtype=np.float32), np.array(is_checked, dtype=np.float32)
+    print('Creating numpy arrays...')
+    games = np.array(games, dtype=np.float16)
+    winners = np.array(winners, dtype=np.float16)
+    print('Numpy arrays created.')
+
+    return games, winners
+
+
+def _generate_dataset(games, winners, ):
+    print('Generating dataset...')
+    return tf.data.Dataset.from_tensor_slices((games, winners)).shuffle(
+        10000).batch(16).prefetch(tf.data.experimental.AUTOTUNE)
 
 
 def get_data():
     _fetch_data()
 
-    return _generate_game_sequences()
+    games, winners = _generate_game_sequences()
+
+    return _generate_dataset(games, winners)

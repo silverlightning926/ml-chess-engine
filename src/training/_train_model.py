@@ -9,16 +9,12 @@ def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=3
     reduce_lr = ReduceLROnPlateau(
         monitor='loss', factor=0.2, patience=3, min_lr=0.0001)
 
-    boards, winners, move_counts, to_move, castling_rights, material, is_checked = train_data
-
     model.fit(
-        x=[boards, move_counts, to_move, castling_rights, material, is_checked],
-        y=winners,
+        train_data,
         epochs=epochs,
         batch_size=batch_size,
         verbose=verbose,
-        callbacks=[early_stopping, reduce_lr],
-        validation_split=0.1
+        callbacks=[early_stopping, reduce_lr]
     )
 
     return model

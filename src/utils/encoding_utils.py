@@ -36,7 +36,7 @@ MAX_PIECE_COUNTS = {
 
 
 def encode_board(board: chess.Board):
-    encoded_board = np.zeros((8, 8, 12), dtype=np.float32)
+    encoded_board = np.zeros((8, 8, 12), dtype=np.float16)
 
     for square in chess.SQUARES:
         piece = board.piece_at(square)
@@ -74,7 +74,7 @@ def encode_castling_rights(board: chess.Board):
         int(board.has_queenside_castling_rights(chess.WHITE)),
         int(board.has_kingside_castling_rights(chess.BLACK)),
         int(board.has_queenside_castling_rights(chess.BLACK))
-    ], dtype=np.float32)
+    ], dtype=np.float16)
 
 
 def encode_to_move(board: chess.Board):
@@ -87,7 +87,7 @@ def encode_move_count(board: chess.Board):
 
 def encode_material_advantage(board: chess.Board):
 
-    material_count = np.zeros(10, dtype=np.float32)
+    material_count = np.zeros(10, dtype=np.float16)
 
     material_count[0] = len(board.pieces(
         chess.PAWN, chess.WHITE)) * PIECE_TO_VALUE[chess.PAWN] / MAX_PIECE_COUNTS[chess.PAWN]
@@ -115,4 +115,4 @@ def encode_material_advantage(board: chess.Board):
 
 
 def encode_is_checked(board: chess.Board):
-    return np.array([board.is_check(), board.turn == chess.WHITE and board.is_check(), board.turn == chess.BLACK and board.is_check()], dtype=np.float32)
+    return np.array([board.is_check(), board.turn == chess.WHITE and board.is_check(), board.turn == chess.BLACK and board.is_check()], dtype=np.float16)
