@@ -85,7 +85,7 @@ def encode_move_count(board: chess.Board):
     return board.fullmove_number
 
 
-def encode_material(board: chess.Board):
+def encode_material_advantage(board: chess.Board):
 
     material_count = np.zeros(10, dtype=np.float32)
 
