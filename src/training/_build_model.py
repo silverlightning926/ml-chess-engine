@@ -20,9 +20,8 @@ def build_model():
         input_move_count = Input(shape=(1,), name='move_count')
         input_to_move = Input(shape=(2,), name='to_move')
         input_castling_rights = Input(shape=(4,), name='castling_rights')
-        input_has_castled = Input(shape=(4,), name='has_castled')
         input_material = Input(shape=(10,), name='material')
-        input_features = [input_board, input_move_count, input_to_move, input_castling_rights, input_has_castled,
+        input_features = [input_board, input_move_count, input_to_move, input_castling_rights,
                           input_material]
 
         conv1 = Conv2D(128, (3, 3), padding='same')(input_board)
@@ -46,8 +45,8 @@ def build_model():
         spatial_dropout = SpatialDropout2D(0.3)(residual)
         global_pool = GlobalAveragePooling2D()(spatial_dropout)
 
-        combined_features = Concatenate()([global_pool, input_move_count, input_to_move, input_castling_rights,
-                                           input_has_castled, input_material])
+        combined_features = Concatenate()(
+            [global_pool, input_move_count, input_to_move, input_castling_rights, input_material])
 
         dense1 = Dense(256)(combined_features)
         dense1 = BatchNormalization()(dense1)

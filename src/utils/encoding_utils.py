@@ -61,34 +61,6 @@ def encode_castling_rights(board: chess.Board):
     )
 
 
-def encode_has_castled(board: chess.Board):
-    has_white_king_castled = False
-    has_white_queen_castled = False
-    has_black_king_castled = False
-    has_black_queen_castled = False
-
-    for move in board.move_stack:
-        if board.is_castling(move):
-            if board.is_kingside_castling(move):
-                if board.turn:
-                    has_white_king_castled = True
-                else:
-                    has_black_king_castled = True
-
-            if board.is_queenside_castling(move):
-                if board.turn:
-                    has_white_queen_castled = True
-                else:
-                    has_black_queen_castled = True
-
-    return (
-        has_white_king_castled,
-        has_white_queen_castled,
-        has_black_king_castled,
-        has_black_queen_castled
-    )
-
-
 def encode_to_move(board: chess.Board):
     return (1 if board.turn else 0, 1 if not board.turn else 0)
 
