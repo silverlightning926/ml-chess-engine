@@ -32,7 +32,7 @@ def evaluate_board(board: chess.Board):
     encoded_castling_rights = np.reshape(encoded_castling_rights, (1, 4))
 
     encoded_to_move = encode_to_move(board)
-    encoded_to_move = np.reshape(encoded_to_move, (1, 2))
+    encoded_to_move = np.reshape(encoded_to_move, (1, 1))
 
     encoded_material = encode_material(board)
     encoded_material = np.reshape(encoded_material, (1, 10))

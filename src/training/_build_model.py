@@ -18,7 +18,7 @@ def build_model():
         print('Model not found. Building model...')
         input_board = Input(shape=(8, 8, 12), name='board')
         input_move_count = Input(shape=(1,), name='move_count')
-        input_to_move = Input(shape=(2,), name='to_move')
+        input_to_move = Input(shape=(1,), name='to_move')
         input_castling_rights = Input(shape=(4,), name='castling_rights')
         input_material = Input(shape=(10,), name='material')
         input_features = [input_board, input_move_count, input_to_move, input_castling_rights,
