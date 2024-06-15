@@ -21,7 +21,7 @@ def build_model():
         input_to_move = Input(shape=(1,), name='to_move')
         input_castling_rights = Input(shape=(4,), name='castling_rights')
         input_material = Input(shape=(10,), name='material')
-        input_checked = Input(shape=(1,), name='is_checked')
+        input_checked = Input(shape=(3,), name='is_checked')
         input_features = [input_board, input_move_count, input_to_move, input_castling_rights,
                           input_material, input_checked]
 
