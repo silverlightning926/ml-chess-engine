@@ -18,6 +18,22 @@ PIECE_TO_INDEX = {
 
 INDEX_TO_PIECE = {v: k for k, v in PIECE_TO_INDEX.items()}
 
+PIECE_TO_VALUE = {
+    chess.PAWN: 1,
+    chess.KNIGHT: 3,
+    chess.BISHOP: 3,
+    chess.ROOK: 5,
+    chess.QUEEN: 9,
+}
+
+MAX_PIECE_COUNTS = {
+    chess.PAWN: 8,
+    chess.KNIGHT: 2,
+    chess.BISHOP: 2,
+    chess.ROOK: 2,
+    chess.QUEEN: 1,
+}
+
 
 def encode_board(board: chess.Board):
     encoded_board = np.zeros((8, 8, 12), dtype=np.float32)
@@ -53,12 +69,12 @@ def encode_winner(winner: str):
 
 
 def encode_castling_rights(board: chess.Board):
-    return (
-        board.has_kingside_castling_rights(chess.WHITE),
-        board.has_queenside_castling_rights(chess.WHITE),
-        board.has_kingside_castling_rights(chess.BLACK),
-        board.has_queenside_castling_rights(chess.BLACK)
-    )
+    return np.array([
+        int(board.has_kingside_castling_rights(chess.WHITE)),
+        int(board.has_queenside_castling_rights(chess.WHITE)),
+        int(board.has_kingside_castling_rights(chess.BLACK)),
+        int(board.has_queenside_castling_rights(chess.BLACK))
+    ], dtype=np.float32)
 
 
 def encode_to_move(board: chess.Board):
@@ -70,15 +86,33 @@ def encode_move_count(board: chess.Board):
 
 
 def encode_material(board: chess.Board):
-    return (
-        len(board.pieces(chess.PAWN, chess.WHITE)),
-        len(board.pieces(chess.KNIGHT, chess.WHITE)),
-        len(board.pieces(chess.BISHOP, chess.WHITE)),
-        len(board.pieces(chess.ROOK, chess.WHITE)),
-        len(board.pieces(chess.QUEEN, chess.WHITE)),
-        len(board.pieces(chess.PAWN, chess.BLACK)),
-        len(board.pieces(chess.KNIGHT, chess.BLACK)),
-        len(board.pieces(chess.BISHOP, chess.BLACK)),
-        len(board.pieces(chess.ROOK, chess.BLACK)),
-        len(board.pieces(chess.QUEEN, chess.BLACK))
-    )
+
+    material_count = np.zeros(10, dtype=np.float32)
+
+    material_count[0] = len(board.pieces(
+        chess.PAWN, chess.WHITE)) * PIECE_TO_VALUE[chess.PAWN] / MAX_PIECE_COUNTS[chess.PAWN]
+    material_count[1] = len(board.pieces(
+        chess.KNIGHT, chess.WHITE)) * PIECE_TO_VALUE[chess.KNIGHT] / MAX_PIECE_COUNTS[chess.KNIGHT]
+    material_count[2] = len(board.pieces(
+        chess.BISHOP, chess.WHITE)) * PIECE_TO_VALUE[chess.BISHOP] / MAX_PIECE_COUNTS[chess.BISHOP]
+    material_count[3] = len(board.pieces(
+        chess.ROOK, chess.WHITE)) * PIECE_TO_VALUE[chess.ROOK] / MAX_PIECE_COUNTS[chess.ROOK]
+    material_count[4] = len(board.pieces(
+        chess.QUEEN, chess.WHITE)) * PIECE_TO_VALUE[chess.QUEEN] / MAX_PIECE_COUNTS[chess.QUEEN]
+
+    material_count[5] = len(board.pieces(
+        chess.PAWN, chess.BLACK)) * PIECE_TO_VALUE[chess.PAWN] / MAX_PIECE_COUNTS[chess.PAWN]
+    material_count[6] = len(board.pieces(
+        chess.KNIGHT, chess.BLACK)) * PIECE_TO_VALUE[chess.KNIGHT] / MAX_PIECE_COUNTS[chess.KNIGHT]
+    material_count[7] = len(board.pieces(
+        chess.BISHOP, chess.BLACK)) * PIECE_TO_VALUE[chess.BISHOP] / MAX_PIECE_COUNTS[chess.BISHOP]
+    material_count[8] = len(board.pieces(
+        chess.ROOK, chess.BLACK)) * PIECE_TO_VALUE[chess.ROOK] / MAX_PIECE_COUNTS[chess.ROOK]
+    material_count[9] = len(board.pieces(
+        chess.QUEEN, chess.BLACK)) * PIECE_TO_VALUE[chess.QUEEN] / MAX_PIECE_COUNTS[chess.QUEEN]
+
+    return material_count
+
+
+def encode_is_checked(board: chess.Board):
+    return np.array([board.is_check(), board.turn == chess.WHITE and board.is_check(), board.turn == chess.BLACK and board.is_check()], dtype=np.float32)

@@ -3,7 +3,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material, encode_move_count
+from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_move_count
 
 model: Model = load_model('models/model.keras')
 
@@ -34,7 +34,7 @@ def evaluate_board(board: chess.Board):
     encoded_to_move = encode_to_move(board)
     encoded_to_move = np.reshape(encoded_to_move, (1, 1))
 
-    encoded_material = encode_material(board)
+    encoded_material = encode_material_advantage(board)
     encoded_material = np.reshape(encoded_material, (1, 10))
 
     prediction = model.predict(

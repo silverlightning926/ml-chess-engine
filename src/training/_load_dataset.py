@@ -5,7 +5,7 @@ import chess
 import numpy as np
 from tqdm import tqdm
 
-from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material, encode_winner, encode_move_count
+from src.utils.encoding_utils import encode_board, encode_castling_rights, encode_to_move, encode_material_advantage, encode_winner, encode_move_count
 
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
@@ -74,7 +74,7 @@ def _generate_boards():
 
             move_counts.append(encode_move_count(board))
 
-            material.append(encode_material(board))
+            material.append(encode_material_advantage(board))
 
     df.progress_apply(process_row, axis=1)
 
