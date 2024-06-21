@@ -58,14 +58,10 @@ def build_model():
         x = Dense(128, activation='relu', kernel_regularizer=l2(1e-4))(x)
         x = Dropout(0.5)(x)
 
-        # Two output neurons for white and black win probabilities
-        white_win_prob = Dense(
-            1, activation='sigmoid', name='white_win_prob', kernel_regularizer=l2(1e-4))(x)
-        black_win_prob = Dense(
-            1, activation='sigmoid', name='black_win_prob', kernel_regularizer=l2(1e-4))(x)
+        output_layer = Dense(2, activation='softmax',
+                             kernel_regularizer=l2(1e-4))(x)
 
-        model = Model(inputs=input_layer, outputs=[
-                      white_win_prob, black_win_prob])
+        model = Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(
             optimizer=Adam(learning_rate=1e-4),
