@@ -14,7 +14,7 @@ PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
 
 MAX_MOVES = 50
 
-BATCH_SIZE = 1
+BATCH_SIZE = 16
 
 api = KaggleApi()
 
