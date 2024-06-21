@@ -8,7 +8,8 @@ import datetime as dt
 LOG_DIR = 'logs/' + dt.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
 
 
-def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=BATCH_SIZE, verbose=1):
+def fit_model(model: Model, train_data: tf.data.Dataset, validation_data: tf.data.Dataset, epochs=10, batch_size=BATCH_SIZE, verbose=1):
+
     early_stopping = EarlyStopping(
         monitor='loss', patience=5, restore_best_weights=True)
     reduce_lr = ReduceLROnPlateau(
@@ -21,6 +22,7 @@ def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=B
         epochs=epochs,
         batch_size=batch_size,
         verbose=verbose,
+        validation_data=validation_data,
         callbacks=[
             early_stopping,
             reduce_lr,

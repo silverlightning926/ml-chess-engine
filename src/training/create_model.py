@@ -4,10 +4,9 @@ from src.training._train_model import fit_model, save_model
 
 
 def main():
-    data = get_data()
-    print(data)
+    train_data, test_data = get_data()
     model = build_model()
-    model = fit_model(model, data, verbose=1)
+    model = fit_model(model, train_data, test_data, verbose=1)
     save_model(model, 'models/model.keras')
 
 

@@ -100,8 +100,23 @@ def _generate_game_sequences():
 
 def _generate_dataset(games, winners, ):
     print('Generating dataset...')
-    return tf.data.Dataset.from_tensor_slices((games, winners)).shuffle(
-        10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
+
+    split = int(len(games) * 0.8)
+
+    print(
+        f'Splitting data into {split} training samples and {len(games) - split} validation samples.')
+
+    print('Bulding Training Data...')
+    train_data = tf.data.Dataset.from_tensor_slices(
+        (games[:split], winners[:split])
+    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE).cache()
+
+    print('Building Validation Data...')
+    val_data = tf.data.Dataset.from_tensor_slices(
+        (games[split:], winners[split:])
+    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE).cache()
+
+    return train_data, val_data
 
 
 def get_data():
