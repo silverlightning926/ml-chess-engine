@@ -59,7 +59,7 @@ def build_model():
         x = Dense(128, activation='relu', kernel_regularizer=l2(1e-4))(x)
         x = Dropout(0.5)(x)
 
-        output_layer = Dense(2, activation='softmax',
+        output_layer = Dense(3, activation='softmax',
                              kernel_regularizer=l2(1e-4))(x)
 
         model = Model(inputs=input_layer, outputs=output_layer)
