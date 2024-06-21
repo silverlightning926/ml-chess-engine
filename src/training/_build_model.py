@@ -66,7 +66,7 @@ def build_model():
 
         model.compile(
             optimizer=Adam(learning_rate=1e-4),
-            loss='binary_crossentropy',
+            loss='category_crossentropy',
             metrics=[Accuracy(), BinaryCrossentropy(), AUC(), Precision(),
                      Recall(), MeanSquaredError()]
         )
