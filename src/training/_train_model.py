@@ -5,7 +5,7 @@ from keras.api.models import Model
 from keras.api.callbacks import EarlyStopping, ReduceLROnPlateau, TensorBoard
 import datetime as dt
 
-LOG_DIR = 'logs/' + dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+LOG_DIR = 'logs/' + dt.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
 
 
 def fit_model(model: Model, train_data: tf.data.Dataset, epochs=10, batch_size=BATCH_SIZE, verbose=1):
