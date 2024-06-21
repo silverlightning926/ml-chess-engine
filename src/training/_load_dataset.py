@@ -12,7 +12,7 @@ from src.utils.encoding_utils import encode_board, encode_winner
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
 
-MAX_MOVES = 50
+MAX_MOVES = 75
 
 BATCH_SIZE = 16
 
