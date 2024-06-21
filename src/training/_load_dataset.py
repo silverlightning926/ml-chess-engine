@@ -16,6 +16,8 @@ MAX_MOVES = 75
 
 BATCH_SIZE = 16
 
+VALIDATION_SPLIT = 0.2
+
 api = KaggleApi()
 
 
@@ -101,7 +103,7 @@ def _generate_game_sequences():
 def _generate_dataset(games, winners, ):
     print('Generating dataset...')
 
-    split = int(len(games) * 0.8)
+    split = int(len(games) * (1 - VALIDATION_SPLIT))
 
     print(
         f'Splitting data into {split} training samples and {len(games) - split} validation samples.')
