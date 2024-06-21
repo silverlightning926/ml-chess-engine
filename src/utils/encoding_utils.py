@@ -61,11 +61,11 @@ def decode_board(encoded_board):
 
 def encode_winner(winner: str):
     if winner == 'white':
-        return 1
+        return np.array([1, 0, 0], dtype=np.float32)
     elif winner == 'black':
-        return -1
+        return np.array([0, 1, 0], dtype=np.float32)
     else:
-        return 0
+        return np.array([0, 0, 1], dtype=np.float32)
 
 
 def encode_castling_rights(board: chess.Board):
