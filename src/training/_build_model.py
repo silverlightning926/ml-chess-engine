@@ -3,6 +3,7 @@ from keras.api.models import Model, load_model
 from keras.api.layers import Input, Conv2D, BatchNormalization, LeakyReLU, GlobalAveragePooling2D, Dense, Dropout, TimeDistributed, GRU, Add, LayerNormalization, MultiHeadAttention
 from keras.api.optimizers import Adam
 from keras.api.regularizers import l2
+from keras.api.metrics import Accuracy, BinaryCrossentropy, AUC, Precision, Recall, MeanSquaredError
 from src.utils.path_utils import find_project_directory
 
 from src.training._load_dataset import MAX_MOVES, BATCH_SIZE
@@ -65,9 +66,9 @@ def build_model():
 
         model.compile(
             optimizer=Adam(learning_rate=1e-4),
-            loss={'white_win_prob': 'binary_crossentropy',
-                  'black_win_prob': 'binary_crossentropy'},
-            metrics=['accuracy']
+            loss='binary_crossentropy',
+            metrics=[Accuracy(), BinaryCrossentropy(), AUC(), Precision(),
+                     Recall(), MeanSquaredError()]
         )
 
     return model
