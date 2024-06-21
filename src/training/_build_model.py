@@ -1,6 +1,7 @@
 import os
 from keras.api.models import Sequential, load_model
 from keras.api.layers import Input, TimeDistributed, Conv2D, MaxPooling2D, Flatten, LSTM, Dropout, Dense, GlobalAveragePooling1D, BatchNormalization
+from keras.api.optimizers import Adam
 from src.utils.path_utils import find_project_directory
 
 from src.training._load_dataset import MAX_MOVES, BATCH_SIZE
@@ -36,16 +37,13 @@ def build_model():
 
             TimeDistributed(Flatten()),
 
-            LSTM(256, return_sequences=True),
-            Dropout(0.5),
+            LSTM(256, return_sequences=True, dropout=0.5,
+                 recurrent_dropout=0.5, stateful=False),
 
             TimeDistributed(Dense(512, activation='relu')),
             TimeDistributed(Dropout(0.5)),
 
             TimeDistributed(Dense(256, activation='relu')),
-            TimeDistributed(Dropout(0.5)),
-
-            TimeDistributed(Dense(128, activation='relu')),
             TimeDistributed(Dropout(0.5)),
 
             GlobalAveragePooling1D(),
@@ -54,7 +52,7 @@ def build_model():
         ])
 
         model.compile(
-            optimizer='adam',
+            optimizer=Adam(learning_rate=0.001),
             loss='categorical_crossentropy',
             metrics=['accuracy']
         )
