@@ -59,8 +59,6 @@ def _generate_game_sequences():
         print('Removing games that are too long...')
         df = df[df['moves'].apply(lambda x: len(x.split())) <= MAX_MOVES]
 
-    longest_game = df['moves'].apply(lambda x: len(x.split())).max()
-
     games = []
     winners = []
 
@@ -76,7 +74,7 @@ def _generate_game_sequences():
             board.push_san(move)
             moves.append(encode_board(board))
 
-        for _ in range(longest_game - len(row['moves'].split())):
+        for _ in range(MAX_MOVES - len(row['moves'].split())):
             moves.append(np.zeros((8, 8, 12), dtype=np.float32))
 
         games.append(np.array(moves, dtype=np.float32))
