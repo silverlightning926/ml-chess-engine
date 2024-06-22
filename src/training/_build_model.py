@@ -48,7 +48,7 @@ def build_model():
             Dense(64, activation='relu'),
             Dropout(0.5),
 
-            Dense(1, activation='linear', name='value'),
+            Dense(3, activation='linear', name='value'),
         ])
 
         model.compile(
