@@ -110,7 +110,7 @@ def main():
     print(board)
     print("===")
     for move in board.move_stack:
-        print(move)
+        print(move, end=' ')
 
 
 if __name__ == '__main__':
