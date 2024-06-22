@@ -4,7 +4,7 @@ from keras.api.layers import Input, TimeDistributed, Conv2D, MaxPooling2D, Flatt
 from keras.api.optimizers import Adam
 from src.utils.path_utils import find_project_directory
 
-from src.training._load_dataset import MAX_MOVES, BATCH_SIZE
+from src.training._load_dataset import BATCH_SIZE
 
 
 def build_model():
@@ -17,43 +17,43 @@ def build_model():
         print('Model not found. Building model...')
 
         model = Sequential([
-            Input(shape=(MAX_MOVES, 8, 8, 12),
+            Input(shape=(8, 8, 12),
                   batch_size=BATCH_SIZE, name='input'),
 
-            TimeDistributed(
-                Conv2D(64, (3, 3), activation='relu', padding='same')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(MaxPooling2D((2, 2))),
+            Conv2D(64, (3, 3), activation='relu', padding='same'),
+            BatchNormalization(),
+            MaxPooling2D((2, 2)),
 
-            TimeDistributed(
-                Conv2D(128, (3, 3), activation='relu', padding='same')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(MaxPooling2D((2, 2))),
 
-            TimeDistributed(
-                Conv2D(256, (3, 3), activation='relu', padding='same')),
-            TimeDistributed(BatchNormalization()),
-            TimeDistributed(MaxPooling2D((2, 2))),
+            Conv2D(128, (3, 3), activation='relu', padding='same'),
+            BatchNormalization(),
+            MaxPooling2D((2, 2)),
 
-            TimeDistributed(Flatten()),
 
-            LSTM(256, return_sequences=True, dropout=0.5,
-                 recurrent_dropout=0.5, stateful=False),
+            Conv2D(256, (3, 3), activation='relu', padding='same'),
+            BatchNormalization(),
+            MaxPooling2D((2, 2)),
 
-            TimeDistributed(Dense(512, activation='relu')),
-            TimeDistributed(Dropout(0.5)),
+            Flatten(),
 
-            TimeDistributed(Dense(256, activation='relu')),
-            TimeDistributed(Dropout(0.5)),
+            Dense(512, activation='relu'),
+            Dropout(0.5),
 
-            GlobalAveragePooling1D(),
+            Dense(256, activation='relu'),
+            Dropout(0.5),
+
+            Dense(128, activation='relu'),
+            Dropout(0.5),
+
+            Dense(64, activation='relu'),
+            Dropout(0.5),
 
             Dense(1, activation='linear', name='value'),
         ])
 
         model.compile(
             optimizer=Adam(),
-            loss='categorical_crossentropy',
+            loss='mean_squared_error',
             metrics=['accuracy']
         )
 

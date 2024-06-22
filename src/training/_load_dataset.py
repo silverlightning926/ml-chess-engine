@@ -12,8 +12,6 @@ from src.utils.encoding_utils import encode_board, encode_winner
 DATASET_PATH = 'data/games.csv'
 PREPROCESSED_DATA_PATH = 'data/preprocessed_data.npz'
 
-MAX_MOVES = 75
-
 BATCH_SIZE = 16
 
 VALIDATION_SPLIT = 0.2
@@ -51,53 +49,44 @@ def _generate_game_sequences():
     if os.path.exists(PREPROCESSED_DATA_PATH):
         print('Preprocessed data found. Loading...')
         data = np.load(PREPROCESSED_DATA_PATH)
-        return data['games'], data['winners']
+        return data['positions'], data['winners']
 
     print('Creating DataFrame...')
     df = _read_data()
     print(df.head())
 
-    if MAX_MOVES is not None:
-        print('Removing games that are too long...')
-        df = df[df['moves'].apply(lambda x: len(x.split())) <= MAX_MOVES]
-
-    games = []
+    positions = []
     winners = []
 
     tqdm.pandas(desc='Processing Data')
 
     def process_row(row):
-        moves = []
-
         board = chess.Board()
+
+        winner = encode_winner(row['winner'])
 
         for move in row['moves'].split():
 
             board.push_san(move)
-            moves.append(encode_board(board))
-
-        for _ in range(MAX_MOVES - len(row['moves'].split())):
-            moves.append(np.zeros((8, 8, 12), dtype=np.float32))
-
-        games.append(np.array(moves, dtype=np.float32))
-        winners.append(encode_winner(row['winner']))
+            positions.append(encode_board(board))
+            winners.append(winner)
 
     df.progress_apply(process_row, axis=1)
 
-    print(f'Size of games: {getsizeof(games)} bytes')
+    print(f'Size of positions: {getsizeof(positions)} bytes')
     print(f'Size of winners: {getsizeof(winners)} bytes')
 
     print('Saving preprocessed data...')
-    np.savez_compressed(PREPROCESSED_DATA_PATH, games=games,
+    np.savez_compressed(PREPROCESSED_DATA_PATH, positions=positions,
                         winners=winners)
     print('Preprocessed data saved.')
 
     print('Creating numpy arrays...')
-    games = np.array(games, dtype=np.float32)
+    positions = np.array(positions, dtype=np.float32)
     winners = np.array(winners, dtype=np.float32)
     print('Numpy arrays created.')
 
-    return games, winners
+    return positions, winners
 
 
 def _generate_dataset(games, winners, ):
