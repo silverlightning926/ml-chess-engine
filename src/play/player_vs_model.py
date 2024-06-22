@@ -89,7 +89,7 @@ def minimax_move(board: chess.Board, depth: int):
 def main():
     board = chess.Board()
 
-    while not board.is_game_over():
+    while not board.is_game_over(claim_draw=True):
         if board.turn:
             move = minimax_move(board, 3)
         else:

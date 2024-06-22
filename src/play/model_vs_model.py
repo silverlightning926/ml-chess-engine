@@ -87,7 +87,7 @@ def minimax_move(board: chess.Board, depth: int):
 def main():
     board = chess.Board()
 
-    while not board.is_game_over():
+    while not board.is_game_over(claim_draw=True):
         move = minimax_move(board, 2)
         if move is None:
             break  # No valid moves, must be a game over state
