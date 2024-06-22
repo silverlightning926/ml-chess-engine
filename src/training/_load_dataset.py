@@ -111,12 +111,12 @@ def _generate_dataset(games, winners, ):
     print('Bulding Training Data...')
     train_data = tf.data.Dataset.from_tensor_slices(
         (games[:split], winners[:split])
-    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE).cache()
+    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
 
     print('Building Validation Data...')
     val_data = tf.data.Dataset.from_tensor_slices(
         (games[split:], winners[split:])
-    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE).cache()
+    ).shuffle(10000).batch(BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
 
     return train_data, val_data
 

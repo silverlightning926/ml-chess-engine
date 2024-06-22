@@ -48,11 +48,11 @@ def build_model():
 
             GlobalAveragePooling1D(),
 
-            Dense(3, activation='softmax')
+            Dense(1, activation='linear', name='value'),
         ])
 
         model.compile(
-            optimizer=Adam(learning_rate=0.001),
+            optimizer=Adam(),
             loss='categorical_crossentropy',
             metrics=['accuracy']
         )
