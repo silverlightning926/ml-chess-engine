@@ -23,11 +23,17 @@ def get_legal_moves(board: chess.Board):
 
 
 def evaluate_board(board: chess.Board):
+    turn = board.turn
+
     encoded_board = encode_board(board)
     encoded_board = np.reshape(encoded_board, (1, 8, 8, 12))
 
-    prediction = model.predict(encoded_board, verbose=0, batch_size=1)
-    return prediction[0][0]
+    prediction = model.predict(encoded_board)
+
+    if turn:
+        return prediction[0][0]
+
+    return prediction[0][1]
 
 
 def minimax(board: chess.Board, depth: int, alpha: float, beta, maximizing_player: bool):
