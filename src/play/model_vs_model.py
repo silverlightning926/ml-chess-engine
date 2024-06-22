@@ -28,7 +28,7 @@ def evaluate_board(board: chess.Board):
     encoded_board = encode_board(board)
     encoded_board = np.reshape(encoded_board, (1, 8, 8, 12))
 
-    prediction = model.predict(encoded_board, verbose=0)
+    prediction = model.predict(encoded_board, verbose=0, batch_size=1)
 
     if turn:
         return prediction[0][0]
