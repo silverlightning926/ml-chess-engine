@@ -21,9 +21,9 @@
   - [Dependencies](#dependencies)
 - [Linting With Autopep8](#linting-with-autopep8)
 - [Dataset](#dataset)
-  - [Model Architecture](#model-architecture)
-  - [Results](#results)
-  - [License](#license)
+- [Model Architecture](#model-architecture)
+- [Results](#results)
+- [License](#license)
 
 <!-- /code_chunk_output -->
 
@@ -95,7 +95,7 @@ The dataset used to train the model is the [Lichess Chess Game Dataset](https://
 
 If you are running [create_model.py](./src/training/create_model.py) the script will automatically download the dataset (if you have Kaggle API authentication setup) from Kaggle and save it to the [data](./data/) directory. After processing the data, the data will cache the processed data to the [data](./data/) directory.
 
-## Model Architecture
+# Model Architecture
 The model architecture used in this project is built here [_build_model.py](./src/training/_build_model.py)
 
 The input to the model is a group of 8x8x12 matrices, where each matrix represents the board state at a different point in time, they are then grouped together as a single game.
@@ -104,8 +104,8 @@ The model consists of a series of convolutional layers, batch normalization laye
 
 The model then ends add a Dense layer with a single output. This layer outputs a continous number between -1 to 1. 1 signifies a win for white, -1 signifies a win for black, and 0 signifies a draw. The model is trained to predict the outcome of the game based on the board state.
 
-## Results
+# Results
 The engine is currently being trained and tested. The results will be updated here once the model and engine has been evaluated.
 
-## License
+# License
 This repository is governed under the MIT license. The repository's license can be found here: [LICENSE](./LICENSE).
